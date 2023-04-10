@@ -103,8 +103,8 @@ export class CdkStack extends cdk.Stack {
      * ECR関連
      */
     // リポジトリの作成
-    const repo = new ecr.Repository(this, "cdk-ecs-bluegreen-l2-repo", {
-      repositoryName: 'cdk-ecs-bluegreen-l2-sample-repo',
+    const repo = new ecr.Repository(this, "cdk-ecs-rolling-l2-repo", {
+      repositoryName: 'cdk-ecs-rolling-l2-sample-repo',
       removalPolicy: RemovalPolicy.DESTROY
     });
 
@@ -160,10 +160,10 @@ export class CdkStack extends cdk.Stack {
       })
     );    
     fargateTaskDefinition.addContainer('SampleECS', {
-      containerName: 'ecs-bluegreen-l2-container',
+      containerName: 'ecs-rolling-l2-container',
       image: ecs.ContainerImage.fromEcrRepository(repo, tag), // タグの指定がここでできる
       logging: ecs.LogDrivers.awsLogs({
-        streamPrefix: 'ecs-bluegreen-l2',
+        streamPrefix: 'ecs-rolling-l2',
       }),
       portMappings: [{
         protocol: ecs.Protocol.TCP,
@@ -175,7 +175,7 @@ export class CdkStack extends cdk.Stack {
     // サービス
     // ローリングアップデート: https://speakerdeck.com/tomoki10/ideal-and-reality-when-implementing-cicd-for-ecs-on-fargate-with-aws-cdk?slide=41
     const service = new ecs.FargateService(this, 'Service', {
-      serviceName: 'ecs-bluegreen-l2-service',
+      serviceName: 'ecs-rolling-l2-service',
       cluster,
       taskDefinition: fargateTaskDefinition,
       securityGroups: [securityGroupAPP],
